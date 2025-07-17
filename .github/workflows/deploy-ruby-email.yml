@@ -1,0 +1,65 @@
+name: Deploy User Service to EC2
+
+on:
+  push:
+    branches:
+      - test  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Set up SSH key for EC2
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_PEM_KEY }}
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build Docker images services
+      run: |
+        docker build -t galo12/change_password ./change_password
+        docker build -t galo12/change_user ./change_user
+        docker build -t galo12/delete-account ./delete_account
+        docker build -t galo12/time ./date-time-service
+
+
+    - name: Push images to Docker Hub
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push galo12/change_password
+        docker push galo12/change_user
+        docker push galo12/delete-account
+        docker push galo12/time
+
+    - name: Deploy services to EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 54.144.95.86
+        username: ec2-user
+        key: ${{ secrets.EC2_PEM_KEY }}
+        script: |
+          # Docker
+          docker stop change_password || true
+          docker rm change_password || true
+          docker stop change_user || true
+          docker rm change_user || true
+          docker stop delete-account || true
+          docker rm delete-account || true
+          docker stop time || true
+          docker rm time || true
+
+          # D
+          docker pull galo12/change_password
+          docker pull galo12/change_user
+          docker pull galo12/delete-account
+          docker pull galo12/time
+
+          # E
+          docker run -d --name change_password -p 4567:4567 --restart unless-stopped galo12/change_password
+          docker run -d --name change_user -p 4568:4568 --restart unless-stopped galo12/change_user
+          docker run -d --name delete-account -p 4569:4569 --restart unless-stopped galo12/delete-account
+          docker run -d --name time -p 5001:5001 --restart unless-stopped galo12/time
