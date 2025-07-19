@@ -14,7 +14,7 @@ jobs:
     - name: Set up SSH key for EC2
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.EC2_PEM_KEY }}
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
       with:
         host: 98.85.244.110
         username: ec2-user
-        key: ${{ secrets.EC2_PEM_KEY }}
+        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           # Docker
           docker stop change_password || true
