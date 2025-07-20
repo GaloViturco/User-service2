@@ -62,4 +62,4 @@ jobs:
           docker run -d --name change_password -p 4567:4567 --restart unless-stopped galo12/change_password
           docker run -d --name change_user -p 4568:4568 --restart unless-stopped galo12/change_user
           docker run -d --name delete-account -p 4569:4569 --restart unless-stopped galo12/delete-account
-          docker run -d --name time -p 5001:5001 --restart unless-stopped galo12/time
+          docker run -d --name time -p 8000:8000 --restart unless-stopped galo12/time

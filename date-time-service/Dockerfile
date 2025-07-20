@@ -1,20 +1,18 @@
-# Usar una imagen base de Python
-FROM python:3.10-slim
+# Imagen base oficial de Python
+FROM python:3.11-slim
 
-# Establecer el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copiar el archivo de requisitos al contenedor
-COPY requirements.txt /app/
-
-# Instalar las dependencias del proyecto
+# Copia el requirements.txt e instala dependencias
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el resto del código al contenedor
-COPY . /app/
+# Copia el resto de la aplicación
+COPY . .
 
-# Exponer el puerto en el que Flask estará corriendo
-EXPOSE 5001
+# Expone el puerto en el que correrá la app
+EXPOSE 8000
 
-# Comando para ejecutar la aplicación Flask
-CMD ["python", "app.py"]
+# Comando para iniciar el servidor
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
